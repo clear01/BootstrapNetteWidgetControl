@@ -1,0 +1,21 @@
+{
+	"name": "clear01/bootstrap-nette-widget-control",
+	"description": "Widget management component based on Twitter Bootstrap and jQuery UI (draggable)",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"keyword": ["widget", "bootstrap", "gadget", "bs3", "jquery"],
+	"authors": [
+		{
+			"name": "Clear01 Development",
+			"email": "development@clear01.com"
+		}
+	],
+    "autoload": {
+        "psr-0": {
+            "Clear01\\Widgets\\Nette\\UI\\TwitterBootstrap\\": "src/"
+        }
+	},
+	"require": {
+		"clear01/nette-widget-control-base": "^0.1"
+	}
+}
