@@ -13,6 +13,18 @@ class BootstrapWidgetControl extends BaseWidgetControl
 		$this->template->setFile(__DIR__ . '/render.latte');
 	}
 
+	function handleRemoveWidget($widgetId)
+	{
+		parent::handleRemoveWidget($widgetId);
+		$this->redrawControl('availableWidgets');
+	}
+
+	function handleInsertWidget($widgetTypeId, $beforeWidgetId = null)
+	{
+		parent::handleInsertWidget($widgetTypeId, $beforeWidgetId);
+		$this->redrawControl('availableWidgets');
+	}
+
 	protected function prepareTemplateRenderEditMode(ITemplate $template)
 	{
 		$this->template->setFile(__DIR__ . '/edit.latte');
