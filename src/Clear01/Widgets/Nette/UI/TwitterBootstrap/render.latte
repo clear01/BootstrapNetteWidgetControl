@@ -1,0 +1,11 @@
+<h3>My widgets</h3>
+{if !$userWidgetIds || !count($userWidgetIds)}
+	<p class="pull-right">You have not selected any widget. You can start by clicking &nbsp;<a n:href="edit!" class="btn btn-default">Edit widgets</a></p>
+{else}
+<div id="widgets" class="widgets">
+	{foreach $userWidgetIds as $widgetId}
+		{control 'widget-'.$widgetId}
+	{/foreach}
+	<div class="clearfix"></div>
+	<a n:href="edit!" class="btn btn-default pull-right">Edit widgets</a></div>
+{/if}

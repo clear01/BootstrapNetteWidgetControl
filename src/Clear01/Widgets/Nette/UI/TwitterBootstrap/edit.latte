@@ -1,0 +1,134 @@
+{snippet updateWidget}
+	{if $updatedWidgetId}
+		<div data-updateWidgetId="{$updatedWidgetId}" id="updateWidget{$uniqueId}">
+			{if $_control->getComponent($widgetComponentName = 'widget-'.$updatedWidgetId) instanceof \Clear01\Widgets\IWidgetComponent}
+				{control $widgetComponentName:editable}
+			{else}
+				{control $widgetComponentName}
+			{/if}
+		</div>
+	{/if}
+{/snippet}
+
+<div class="row">
+	<div class="col-md-8">
+		<div class="alert alert-info">
+			<i class="icon-info-sign pull-right" style="font-size: 30px"></i>
+			<p>
+				You can drag &amp; drop between Available and Selected widgets.
+			</p>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<a href="{link dashboard!}" class="btn btn-lg btn-warning pull-right">
+			Leave widget edit mode
+		</a>
+	</div>
+</div>
+
+<h3>Selected widgets</h3>
+<div n:snippet="userWidgets" class="userWidgets widgets clearfix" style="background-color: #ffff9c;">
+	{foreach $userWidgetIds as $widgetId}
+		{? $widgetIds[] = $widgetId;}
+		{var $widgetComponentName = 'widget-'.$widgetId}
+		{if $_control->getComponent($widgetComponentName) instanceof \Clear01\Widgets\IWidgetComponent}
+			{control $widgetComponentName:editable}
+		{else}
+			{control $widgetComponentName}
+		{/if}
+	{/foreach}
+</div>
+
+{var $widgetIds = []}
+{foreach $userWidgetIds as $widgetId}
+	{? $widgetIds[] = $widgetId;}
+{/foreach}
+<script>
+	var widgetIds = {$widgetIds};
+	$('.userWidgets').children().each(function(index){
+		$(this).attr('data-widgetId', widgetIds[index]);
+	});
+</script>
+
+<div class="clearfix"></div>
+<h3>Available widgets</h3>
+<div n:snippet="availableWidgets" class="availableWidgets widgets clearfix" style="background-color: #eee;">
+	{var $widgetTypeIds = []}
+	{foreach $availableWidgets as $widgetTypeId}
+		{? $widgetTypeIds[] = $widgetTypeId;}
+		{var $widgetComponentName = 'wa'.$widgetTypeId}
+		{if $_control->getComponent($widgetComponentName) instanceof \Clear01\Widgets\IWidgetComponent}
+			{control $widgetComponentName:placeholder}
+		{else}
+			{control $widgetComponentName}
+		{/if}
+	{/foreach}
+	<script>
+		var widgetTypeIds = {$widgetTypeIds};
+		$('.availableWidgets').children().each(function(index){
+			$(this).attr('data-widgetTypeId', widgetTypeIds[index]);
+		});
+	</script>
+</div>
+
+<div class="clearfix"></div>
+
+<script>
+	$(function() {
+
+		$('.userWidgets > a, .availableWidgets > a').click(function() { return false; }).attr('href', '#');
+		$('.userWidgets').sortable({
+			connectWith: '.availableWidgets',
+			update: function(event, ui) {
+				var succeedingWidget = $(ui.item).next();
+				var succeedingWidgetId = succeedingWidget.size() > 0 ? $(succeedingWidget).attr('data-widgetId') : '';
+				if(ui.sender != null && $(ui.sender).hasClass('availableWidgets')) {
+					$(ui.item).addClass('newWidgetPlaceholder' + {$uniqid});
+					$.nette.ajax({
+						url: {link insertWidget! '__WIDGET_TYPE_ID__', '__RELATED_WIDGET_ID__'}
+							.replace('__WIDGET_TYPE_ID__', $(ui.item).attr('data-widgetTypeId'))
+							.replace('__RELATED_WIDGET_ID__', succeedingWidgetId),
+						success: function(payload){
+							console.log(payload);
+						},
+						complete: function() {
+							$('.newWidgetPlaceholder' + {$uniqid}).removeClass('newWidgetPlaceholder' + {$uniqid});
+						}
+					});
+				} else if($(ui.item).closest('.widgets').hasClass('userWidgets')) {
+					$.nette.ajax({
+						url: {link moveWidgetBefore! '__WIDGET_ID__', '__RELATED_WIDGET_ID__'}
+							.replace('__WIDGET_ID__', $(ui.item).attr('data-widgetId'))
+							.replace('__RELATED_WIDGET_ID__', succeedingWidgetId),
+						success: function(payload) {
+							console.log(payload);
+						}
+					});
+				}
+			}
+		});
+		$('.availableWidgets').sortable({
+			connectWith: '.userWidgets',
+			update: function(event, ui) {
+				if(ui.sender != null && $(ui.sender).hasClass('userWidgets')) {
+					$.nette.ajax({link removeWidget! '__WIDGET_ID__'}.replace('__WIDGET_ID__', $(ui.item).attr('data-widgetId')));
+				}
+			}
+		});
+
+		$.nette.ext('snippets').after(function(el) {
+			$(el).find('#updateWidget' + {$uniqueId}).each(function(){
+				var widgetId = $(this).attr('data-updateWidgetId');
+				var existingWidget = $('[data-widgetId="' + widgetId + '"]');
+
+				$(this).children().attr('data-widgetId', widgetId);
+
+				if(existingWidget.length) { // update widget
+					existingWidget.replaceWith($(this).children());
+				} else {	// insert new widget
+					$('.newWidgetPlaceholder' + {$uniqid}).replaceWith($(this).children());
+				}
+			});
+		});
+	});
+</script>
