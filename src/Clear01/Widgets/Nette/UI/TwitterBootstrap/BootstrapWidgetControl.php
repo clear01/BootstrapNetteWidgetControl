@@ -3,7 +3,7 @@
 namespace Clear01\Widgets\Nette\UI\TwitterBootstrap;
 
 use \Clear01\Widgets\Nette\UI\BaseWidgetControl;
-use Nette\Templating\ITemplate;
+use Nette\Application\UI\ITemplate;
 
 class BootstrapWidgetControl extends BaseWidgetControl
 {

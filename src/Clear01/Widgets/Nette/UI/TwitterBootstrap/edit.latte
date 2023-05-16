@@ -29,7 +29,7 @@
 <h3>Selected widgets</h3>
 <div n:snippet="userWidgets" class="userWidgets widgets clearfix" style="background-color: #ffff9c;">
 	{foreach $userWidgetIds as $widgetId}
-		{? $widgetIds[] = $widgetId;}
+		{var $widgetIds[] = $widgetId;}
 		{var $widgetComponentName = 'widget-'.$widgetId}
 		{if $_control->getComponent($widgetComponentName) instanceof \Clear01\Widgets\IWidgetComponent}
 			{control $widgetComponentName:editable}
@@ -41,7 +41,7 @@
 
 {var $widgetIds = []}
 {foreach $userWidgetIds as $widgetId}
-	{? $widgetIds[] = $widgetId;}
+	{var $widgetIds[] = $widgetId;}
 {/foreach}
 <script>
 	var widgetIds = {$widgetIds};
@@ -55,7 +55,7 @@
 <div n:snippet="availableWidgets" class="availableWidgets widgets clearfix" style="background-color: #eee;">
 	{var $widgetTypeIds = []}
 	{foreach $availableWidgets as $widgetTypeId}
-		{? $widgetTypeIds[] = $widgetTypeId;}
+		{var $widgetTypeIds[] = $widgetTypeId;}
 		{var $widgetComponentName = 'wa'.$widgetTypeId}
 		{if $_control->getComponent($widgetComponentName) instanceof \Clear01\Widgets\IWidgetComponent}
 			{control $widgetComponentName:placeholder}
@@ -81,7 +81,7 @@
 			connectWith: '.availableWidgets',
 			update: function(event, ui) {
 				var succeedingWidget = $(ui.item).next();
-				var succeedingWidgetId = succeedingWidget.size() > 0 ? $(succeedingWidget).attr('data-widgetId') : '';
+				var succeedingWidgetId = succeedingWidget.length > 0 ? $(succeedingWidget).attr('data-widgetId') : '';
 				if(ui.sender != null && $(ui.sender).hasClass('availableWidgets')) {
 					$(ui.item).addClass('newWidgetPlaceholder' + {$uniqid});
 					$.nette.ajax({
